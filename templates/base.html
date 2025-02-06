@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - Notes & Files App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/330/330705.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="/" class="text-xl font-bold text-blue-600">Notes & Files</a>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="/" class="inline-flex items-center px-1 pt-1 text-gray-500 hover:text-gray-900">Home</a>
+                        <a href="/notes" class="inline-flex items-center px-1 pt-1 text-gray-500 hover:text-gray-900">Notes</a>
+                        <a href="/files" class="inline-flex items-center px-1 pt-1 text-gray-500 hover:text-gray-900">Files</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+<!-- Footer -->
+<footer class="bg-gray-100 mt-12">
+    <div class="max-w-6xl mx-auto py-8 px-4 text-center">
+        <p class="text-gray-600 text-sm">&copy; 2025 Notes & Files App. All rights reserved.</p>
+
+        <p class="text-gray-700 mt-3">
+            Built by
+            <a href="https://levimukuha.pythonanywhere.com" class="text-blue-600 font-semibold hover:underline">Levi</a>.
+        </p>
+
+        <p class="text-gray-700 mt-2">
+            This is an open-source project.
+            Contribute or explore the source code on
+            <a href="https://github.com/Levi-LMN/ByteBox" class="text-blue-600 font-semibold hover:underline">
+                GitHub
+            </a>.
+        </p>
+    </div>
+</footer>
+
+
+
+</body>
+</html>

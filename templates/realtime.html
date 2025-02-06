@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Notes{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+    <div class="max-w-5xl mx-auto px-4">
+        <!-- Floating Status Message -->
+        <div id="saveStatus" class="fixed top-6 right-6 text-sm text-white py-3 px-6 rounded-lg shadow-lg opacity-0 transition-all duration-300 transform translate-y-2">
+            Status message here
+        </div>
+
+        <!-- Main Content -->
+        <div class="space-y-6">
+            <!-- Header Section -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+                        Real-time Notebook
+                    </h1>
+                    <p class="text-gray-600 mt-1">Your personal digital notebook - saves in realtime as you type</p>
+                </div>
+
+                <div class="flex gap-3">
+                    <button id="saveBtn" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:ring-4 focus:ring-blue-300 transition-all">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                        </svg>
+                        Save
+                    </button>
+                    <button id="clearBtn" class="inline-flex items-center px-4 py-2 bg-white text-gray-700 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 transition-all">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Editor Card -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100">
+                <div class="p-1">
+                    <textarea
+                        id="editor"
+                        class="w-full min-h-[500px] p-6 rounded-lg bg-transparent focus:outline-none focus:ring-0 resize-y text-gray-700"
+                        placeholder="Start typing your notes here..."
+                    >{{ content }}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let timeoutId;
+const editor = document.getElementById('editor');
+const saveBtn = document.getElementById('saveBtn');
+const clearBtn = document.getElementById('clearBtn');
+const saveStatus = document.getElementById('saveStatus');
+
+function showStatusMessage(message, bgColor = 'bg-gray-800') {
+    saveStatus.textContent = message;
+    saveStatus.classList.remove('opacity-0', 'translate-y-2', 'bg-red-500', 'bg-green-500', 'bg-blue-500', 'bg-yellow-500');
+    saveStatus.classList.add(bgColor, 'opacity-100', 'translate-y-0');
+
+    setTimeout(() => {
+        saveStatus.classList.remove('opacity-100', 'translate-y-0');
+        saveStatus.classList.add('opacity-0', 'translate-y-2');
+    }, 2000);
+}
+
+editor.addEventListener('input', () => {
+    clearTimeout(timeoutId);
+    showStatusMessage('Typing...', 'bg-blue-500');
+    timeoutId = setTimeout(() => {
+        saveNote();
+    }, 1200);
+});
+
+saveBtn.addEventListener('click', () => {
+    saveNote();
+});
+
+clearBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to clear all notes? This cannot be undone.')) {
+        editor.value = '';
+        saveNote();
+    }
+});
+
+function saveNote() {
+    showStatusMessage('Saving...', 'bg-yellow-500');
+
+    fetch('/save_note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'content=' + encodeURIComponent(editor.value)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showStatusMessage('Saved successfully', 'bg-green-500');
+        } else {
+            showStatusMessage('Error saving', 'bg-red-500');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showStatusMessage('Error saving', 'bg-red-500');
+    });
+}
+
+// Automatically adjust textarea height
+editor.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+});
+</script>
+{% endblock %}
