@@ -4,7 +4,7 @@
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
     <div class="max-w-5xl mx-auto px-4">
         <!-- Floating Status Message -->
-        <div id="saveStatus" class="fixed top-6 right-6 text-sm text-white py-3 px-6 rounded-lg shadow-lg opacity-0 transition-all duration-300 transform translate-y-2">
+        <div id="saveStatus" class="fixed top-6 right-6 text-sm text-white py-3 px-6 rounded-lg shadow-lg opacity-0 transition-all duration-300 transform translate-y-2 z-50">
             Status message here
         </div>
 
@@ -37,17 +37,130 @@
 
             <!-- Editor Card -->
             <div class="bg-white rounded-xl shadow-lg border border-gray-100">
+                <!-- Toolbar -->
+                <div class="border-b border-gray-200 p-3 flex flex-wrap gap-2">
+                    <button type="button" onclick="formatText('bold')" class="p-2 hover:bg-gray-100 rounded transition-colors" title="Bold (Ctrl+B)">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h5a5 5 0 001.93-.39 3.001 3.001 0 003.18-4.44A3 3 0 0011 6H5zm0 2h6a1 1 0 110 2H5V5zm0 4h6a1 1 0 110 2H5V9z"/>
+                        </svg>
+                    </button>
+                    <button type="button" onclick="formatText('italic')" class="p-2 hover:bg-gray-100 rounded transition-colors" title="Italic (Ctrl+I)">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M8 1a1 1 0 011 1v1.5l.5-.167A6 6 0 0115 9a1 1 0 01-2 0 4 4 0 00-5.25-3.788l-.5.167V7a1 1 0 01-2 0V2a1 1 0 011-1h1zm3 16a1 1 0 01-1-1v-1.5l-.5.167A6 6 0 015 9a1 1 0 012 0 4 4 0 005.25 3.788l.5-.167V11a1 1 0 012 0v5a1 1 0 01-1 1h-1z"/>
+                        </svg>
+                    </button>
+                    <button type="button" onclick="formatText('underline')" class="p-2 hover:bg-gray-100 rounded transition-colors" title="Underline (Ctrl+U)">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 2a1 1 0 011 1v6a5 5 0 0010 0V3a1 1 0 112 0v6a7 7 0 11-14 0V3a1 1 0 011-1zM2 17a1 1 0 011-1h14a1 1 0 110 2H3a1 1 0 01-1-1z"/>
+                        </svg>
+                    </button>
+                    <button type="button" onclick="formatText('strikeThrough')" class="p-2 hover:bg-gray-100 rounded transition-colors" title="Strikethrough">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm2-4a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm0 8a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"/>
+                        </svg>
+                    </button>
+                    <div class="w-px bg-gray-300 mx-1"></div>
+                    <button type="button" onclick="formatText('insertUnorderedList')" class="p-2 hover:bg-gray-100 rounded transition-colors" title="Bullet List">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                        </svg>
+                    </button>
+                    <button type="button" onclick="formatText('insertOrderedList')" class="p-2 hover:bg-gray-100 rounded transition-colors" title="Numbered List">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                        </svg>
+                    </button>
+                    <div class="w-px bg-gray-300 mx-1"></div>
+                    <button type="button" onclick="formatText('justifyLeft')" class="p-2 hover:bg-gray-100 rounded transition-colors" title="Align Left">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                        </svg>
+                    </button>
+                    <button type="button" onclick="formatText('justifyCenter')" class="p-2 hover:bg-gray-100 rounded transition-colors" title="Align Center">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm2 4a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm-2 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm2 4a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"/>
+                        </svg>
+                    </button>
+                    <button type="button" onclick="formatText('justifyRight')" class="p-2 hover:bg-gray-100 rounded transition-colors" title="Align Right">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm4 4a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1zm-4 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm4 4a1 1 0 011-1h8a1 1 0 110 2H8a1 1 0 01-1-1z"/>
+                        </svg>
+                    </button>
+                    <div class="w-px bg-gray-300 mx-1"></div>
+                    <select onchange="formatText('fontSize', this.value); this.value=''" class="px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50">
+                        <option value="">Font Size</option>
+                        <option value="1">Small</option>
+                        <option value="3">Normal</option>
+                        <option value="5">Large</option>
+                        <option value="7">Huge</option>
+                    </select>
+                    <select onchange="formatText('foreColor', this.value); this.value=''" class="px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50">
+                        <option value="">Text Color</option>
+                        <option value="#000000">Black</option>
+                        <option value="#FF0000">Red</option>
+                        <option value="#00FF00">Green</option>
+                        <option value="#0000FF">Blue</option>
+                        <option value="#FFFF00">Yellow</option>
+                        <option value="#FF00FF">Magenta</option>
+                        <option value="#00FFFF">Cyan</option>
+                    </select>
+                    <select onchange="formatText('hiliteColor', this.value); this.value=''" class="px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50">
+                        <option value="">Highlight</option>
+                        <option value="transparent">None</option>
+                        <option value="#FFFF00">Yellow</option>
+                        <option value="#00FF00">Green</option>
+                        <option value="#00FFFF">Cyan</option>
+                        <option value="#FF69B4">Pink</option>
+                    </select>
+                </div>
+
+                <!-- Editor -->
                 <div class="p-1">
-                    <textarea
+                    <div
                         id="editor"
-                        class="w-full min-h-[500px] p-6 rounded-lg bg-transparent focus:outline-none focus:ring-0 resize-y text-gray-700"
+                        contenteditable="true"
+                        class="w-full min-h-[500px] p-6 rounded-lg bg-transparent focus:outline-none resize-y text-gray-700 overflow-y-auto"
                         placeholder="Start typing your notes here..."
-                    >{{ content }}</textarea>
+                    >{{ content|safe }}</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+#editor:empty:before {
+    content: attr(placeholder);
+    color: #9CA3AF;
+}
+
+#editor:focus:before {
+    content: none;
+}
+
+/* Ensure proper styling for formatted content */
+#editor ul, #editor ol {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+#editor ul {
+    list-style-type: disc;
+}
+
+#editor ol {
+    list-style-type: decimal;
+}
+
+#editor li {
+    margin-bottom: 0.25rem;
+}
+
+#editor p {
+    margin-bottom: 0.5rem;
+}
+</style>
 
 <script>
 let timeoutId;
@@ -67,6 +180,31 @@ function showStatusMessage(message, bgColor = 'bg-gray-800') {
     }, 2000);
 }
 
+function formatText(command, value = null) {
+    document.execCommand(command, false, value);
+    editor.focus();
+}
+
+// Keyboard shortcuts
+editor.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+        switch(e.key.toLowerCase()) {
+            case 'b':
+                e.preventDefault();
+                formatText('bold');
+                break;
+            case 'i':
+                e.preventDefault();
+                formatText('italic');
+                break;
+            case 'u':
+                e.preventDefault();
+                formatText('underline');
+                break;
+        }
+    }
+});
+
 editor.addEventListener('input', () => {
     clearTimeout(timeoutId);
     showStatusMessage('Typing...', 'bg-blue-500');
@@ -81,7 +219,7 @@ saveBtn.addEventListener('click', () => {
 
 clearBtn.addEventListener('click', () => {
     if (confirm('Are you sure you want to clear all notes? This cannot be undone.')) {
-        editor.value = '';
+        editor.innerHTML = '';
         saveNote();
     }
 });
@@ -92,7 +230,7 @@ function saveNote() {
     fetch('/save_note', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'content=' + encodeURIComponent(editor.value)
+        body: 'content=' + encodeURIComponent(editor.innerHTML)
     })
     .then(response => response.json())
     .then(data => {
@@ -107,11 +245,5 @@ function saveNote() {
         showStatusMessage('Error saving', 'bg-red-500');
     });
 }
-
-// Automatically adjust textarea height
-editor.addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = (this.scrollHeight) + 'px';
-});
 </script>
 {% endblock %}
