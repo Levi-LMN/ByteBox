@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 # Configuration for file uploads
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = '/home/LMN/uploads'
 # Extended file types including coding files
 ALLOWED_EXTENSIONS = {
     # Text and Documents
