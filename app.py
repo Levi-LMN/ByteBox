@@ -6,8 +6,10 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-# Configuration for file uploads
-UPLOAD_FOLDER = '/home/LMN/uploads'
+# Configuration for file uploads - Use relative path or absolute based on script location
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
+
 # Extended file types including coding files
 ALLOWED_EXTENSIONS = {
     # Text and Documents
@@ -45,6 +47,7 @@ FILE_CATEGORIES = {
     'data': {'csv', 'xlsx', 'xls', 'db', 'sqlite'}
 }
 
+
 def convert_str_to_datetime(date_str):
     """Convert string to datetime object if it's a string"""
     if isinstance(date_str, str):
@@ -53,6 +56,7 @@ def convert_str_to_datetime(date_str):
         except ValueError:
             return datetime.now()  # Fallback to current time if parsing fails
     return date_str  # Return as is if already datetime object
+
 
 # Database setup and helper functions
 def init_db():
@@ -80,11 +84,14 @@ def init_db():
     finally:
         conn.close()
 
+
 # Initialize database
 init_db()
 
+
 def get_db_connection():
     return sqlite3.connect('notebook.db')
+
 
 def get_file_category(file_type):
     for category, extensions in FILE_CATEGORIES.items():
@@ -92,11 +99,14 @@ def get_file_category(file_type):
             return category
     return 'other'
 
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
 def get_file_size(file_path):
     return os.path.getsize(file_path)
+
 
 # Note functions
 def save_note(content, page_type):
@@ -123,6 +133,7 @@ def save_note(content, page_type):
     finally:
         conn.close()
 
+
 def get_note(page_type):
     try:
         conn = get_db_connection()
@@ -135,6 +146,7 @@ def get_note(page_type):
         return ""
     finally:
         conn.close()
+
 
 # File functions
 def get_all_files():
@@ -156,6 +168,7 @@ def get_all_files():
     finally:
         conn.close()
 
+
 def get_files_by_category(category):
     try:
         conn = get_db_connection()
@@ -176,6 +189,7 @@ def get_files_by_category(category):
     finally:
         conn.close()
 
+
 def save_file_to_db(filename, file_path, file_type):
     try:
         conn = get_db_connection()
@@ -194,6 +208,7 @@ def save_file_to_db(filename, file_path, file_type):
         return False
     finally:
         conn.close()
+
 
 def delete_file(file_id):
     try:
@@ -221,6 +236,7 @@ def delete_file(file_id):
     finally:
         conn.close()
 
+
 def delete_all_files():
     try:
         conn = get_db_connection()
@@ -245,6 +261,7 @@ def delete_all_files():
     finally:
         conn.close()
 
+
 def clear_database():
     try:
         conn = get_db_connection()
@@ -258,15 +275,18 @@ def clear_database():
     finally:
         conn.close()
 
+
 # Routes
 @app.route('/')
 def index():
     return render_template('index.html')
 
+
 @app.route('/notes')
 def notes():
     content = get_note('notes')
     return render_template('realtime.html', content=content)
+
 
 @app.route('/files')
 def files():
@@ -277,12 +297,14 @@ def files():
         files = get_all_files()
     return render_template('files.html', files=files, categories=FILE_CATEGORIES.keys())
 
+
 @app.route('/save_note', methods=['POST'])
 def save_notes():
     content = request.form.get('content', '')
     if save_note(content, 'notes'):
         return jsonify({'status': 'success'})
     return jsonify({'status': 'error', 'message': 'Failed to save note'}), 500
+
 
 @app.route('/upload_file', methods=['POST'])
 def upload_file():
@@ -320,6 +342,7 @@ def upload_file():
 
     return jsonify({'status': 'error', 'message': 'Invalid file type'}), 400
 
+
 @app.route('/download_file/<int:file_id>')
 def download_file(file_id):
     try:
@@ -330,15 +353,30 @@ def download_file(file_id):
 
         if result:
             filename, file_path = result
+
+            # Check if the file exists at the stored path
             if os.path.exists(file_path):
                 return send_file(file_path, as_attachment=True, download_name=filename)
-            return jsonify({'status': 'error', 'message': 'File not found on server'}), 404
+
+            # If not found, try looking in the UPLOAD_FOLDER with just the filename
+            alternative_path = os.path.join(UPLOAD_FOLDER, filename)
+            if os.path.exists(alternative_path):
+                # Update the database with the correct path
+                c.execute('UPDATE files SET file_path = ? WHERE id = ?', (alternative_path, file_id))
+                conn.commit()
+                return send_file(alternative_path, as_attachment=True, download_name=filename)
+
+            return jsonify({
+                'status': 'error',
+                'message': f'File not found. Searched: {file_path} and {alternative_path}'
+            }), 404
 
         return jsonify({'status': 'error', 'message': 'File not found in database'}), 404
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
     finally:
         conn.close()
+
 
 @app.route('/clear_database', methods=['POST'])
 def clear_db():
@@ -349,17 +387,20 @@ def clear_db():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+
 @app.route('/delete_file/<int:file_id>', methods=['DELETE'])
 def delete_file_route(file_id):
     if delete_file(file_id):
         return jsonify({'status': 'success'})
     return jsonify({'status': 'error', 'message': 'Failed to delete file'}), 500
 
+
 @app.route('/delete_all_files', methods=['DELETE'])
 def delete_all_files_route():
     if delete_all_files():
         return jsonify({'status': 'success'})
     return jsonify({'status': 'error', 'message': 'Failed to delete all files'}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
